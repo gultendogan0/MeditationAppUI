@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import com.example.meditationappui.R
 import com.example.meditationappui.ui.theme.ButtonBlue
 import com.example.meditationappui.ui.theme.DarkerButtonBlue
 import com.example.meditationappui.ui.theme.DeepBlue
+import com.example.meditationappui.ui.theme.LightRed
 import com.example.meditationappui.ui.theme.TextWhite
 
 @Composable
@@ -41,6 +43,7 @@ fun HomeScreen(){
         Column{
             GreetingSection()
             ChipSection(chips = listOf("Sweet sleep","Insomnia","Depression"))
+            CurrentMeditation()
         }
     }
 }
@@ -59,14 +62,14 @@ fun GreetingSection(
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Good morning, $name",
-                style = MaterialTheme.typography.labelSmall
-            )
-            Text(
-                text = "We wish you have a good day!",
-                style = MaterialTheme.typography.bodyLarge
-            )
+                Text(
+                    text = "Good morning, $name",
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Text(
+                    text = "We wish you have a good day!",
+                    style = MaterialTheme.typography.bodyLarge
+                )
         }
 
         Icon(
@@ -102,6 +105,49 @@ fun ChipSection(
             ){
                 Text(text = chips[it], color = TextWhite)
             }
+        }
+    }
+}
+
+@Composable
+fun CurrentMeditation(
+    color: Color = LightRed
+){
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .padding(15.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(color)
+            .padding(horizontal = 15.dp, vertical = 20.dp)
+            .fillMaxWidth()
+    ) {
+        Column {
+            Text(
+                text = "Daily Thought",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = "Meditation • 3-10 min",
+                style = MaterialTheme.typography.bodyLarge,
+                color = TextWhite
+            )
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(ButtonBlue)
+                .padding(10.dp)
+        ){
+            Icon(
+                painter = painterResource(id = R.drawable.ic_play),
+                contentDescription = "Play",
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
