@@ -2,6 +2,7 @@ package com.example.meditationappui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,11 +35,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import com.example.meditationappui.ui.theme.AquaBlue
 import com.example.meditationappui.ui.theme.Beige1
 import com.example.meditationappui.ui.theme.Beige2
 import com.example.meditationappui.ui.theme.Beige3
@@ -58,14 +65,15 @@ import com.example.meditationappui.ui.theme.OrangeYellow3
 import com.example.meditationappui.ui.theme.TextWhite
 @ExperimentalFoundationApi
 @Composable
-fun HomeScreen(){
-    Box(modifier = Modifier
-        .background(DeepBlue)
-        .fillMaxSize()
-    ){
-        Column{
+fun HomeScreen() {
+    Box(
+        modifier = Modifier
+            .background(DeepBlue)
+            .fillMaxSize()
+    ) {
+        Column {
             GreetingSection()
-            ChipSection(chips = listOf("Sweet sleep","Insomnia","Depression"))
+            ChipSection(chips = listOf("Sweet sleep", "Insomnia", "Depression"))
             CurrentMeditation()
             FeatureSection(
                 features = listOf(
@@ -100,33 +108,112 @@ fun HomeScreen(){
                 )
             )
         }
+
+
+        BottomMenu(items = listOf(
+            BottomMenuContent("Home", R.drawable.ic_home),
+            BottomMenuContent("Meditate", R.drawable.ic_bubble),
+            BottomMenuContent("Sleep", R.drawable.ic_moon),
+            BottomMenuContent("Music", R.drawable.ic_music),
+            BottomMenuContent("Profile", R.drawable.ic_profile),
+        ), modifier = Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+@Composable
+fun BottomMenu(
+    items: List<BottomMenuContent>,
+    modifier: Modifier = Modifier,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    initialSelectedItemIndex: Int = 0
+) {
+    var selectedItemIndex by remember {
+        mutableStateOf(initialSelectedItemIndex)
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(15.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            BottomMenuItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighlightColor = activeHighlightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ) {
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomMenuItem(
+    item: BottomMenuContent,
+    isSelected: Boolean = false,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable {
+            onItemClick()
+        }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) activeHighlightColor else Color.Transparent)
+                .padding(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconId),
+                contentDescription = item.title,
+                tint = if (isSelected) activeTextColor else inactiveTextColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(
+            text = item.title,
+            color = if(isSelected) activeTextColor else inactiveTextColor
+        )
     }
 }
 
 @Composable
 fun GreetingSection(
     name: String = "Gülten"
-){
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
-    ){
+    ) {
         Column(
             verticalArrangement = Arrangement.Center
         ) {
-                Text(
-                    text = "Good morning, $name",
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    text = "We wish you have a good day!",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+            Text(
+                text = "Good morning, $name",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = "We wish you have a good day!",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
-
         Icon(
             painter = painterResource(id = R.drawable.ic_search),
             contentDescription = "Search",
@@ -139,13 +226,14 @@ fun GreetingSection(
 @Composable
 fun ChipSection(
     chips: List<String>
-){
+) {
     var selectedChipIndex by remember {
         mutableStateOf(0)
     }
     LazyRow {
-        items(chips.size){
-            Box(contentAlignment = Alignment.Center,
+        items(chips.size) {
+            Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
                     .clickable {
@@ -157,7 +245,7 @@ fun ChipSection(
                         else DarkerButtonBlue
                     )
                     .padding(15.dp)
-            ){
+            ) {
                 Text(text = chips[it], color = TextWhite)
             }
         }
@@ -167,7 +255,7 @@ fun ChipSection(
 @Composable
 fun CurrentMeditation(
     color: Color = LightRed
-){
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -196,7 +284,7 @@ fun CurrentMeditation(
                 .clip(CircleShape)
                 .background(ButtonBlue)
                 .padding(10.dp)
-        ){
+        ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_play),
                 contentDescription = "Play",
@@ -221,18 +309,17 @@ fun FeatureSection(features: List<Feature>) {
             contentPadding = PaddingValues(start = 7.5.dp, end = 7.5.dp, bottom = 100.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
-            items(features.size){
+            items(features.size) {
                 FeatureItem(feature = features[it])
             }
         }
     }
 }
 
-
 @Composable
 fun FeatureItem(
     feature: Feature
-){
+) {
     BoxWithConstraints(
         modifier = Modifier
             .padding(7.5.dp)
@@ -243,19 +330,19 @@ fun FeatureItem(
         val width = constraints.maxWidth
         val height = constraints.maxHeight
 
-        //Medium colored path
-        val mediumColoredPoint1 = Offset(0f,height*0.3f)
-        val mediumColoredPoint2 = Offset(width*0.1f,height*0.35f)
-        val mediumColoredPoint3 = Offset(width*0.4f,height*0.05f)
-        val mediumColoredPoint4 = Offset(width*0.75f,height*0.7f)
-        val mediumColoredPoint5 = Offset(width*1.4f,-height.toFloat())
+        // Medium colored path
+        val mediumColoredPoint1 = Offset(0f, height * 0.3f)
+        val mediumColoredPoint2 = Offset(width * 0.1f, height * 0.35f)
+        val mediumColoredPoint3 = Offset(width * 0.4f, height * 0.05f)
+        val mediumColoredPoint4 = Offset(width * 0.75f, height * 0.7f)
+        val mediumColoredPoint5 = Offset(width * 1.4f, -height.toFloat())
 
         val mediumColoredPath = Path().apply {
-            moveTo(mediumColoredPoint1.x,mediumColoredPoint1.y)
-            standardQuadFromTo(mediumColoredPoint1,mediumColoredPoint2)
-            standardQuadFromTo(mediumColoredPoint2,mediumColoredPoint3)
-            standardQuadFromTo(mediumColoredPoint3,mediumColoredPoint4)
-            standardQuadFromTo(mediumColoredPoint4,mediumColoredPoint5)
+            moveTo(mediumColoredPoint1.x, mediumColoredPoint1.y)
+            standardQuadFromTo(mediumColoredPoint1, mediumColoredPoint2)
+            standardQuadFromTo(mediumColoredPoint2, mediumColoredPoint3)
+            standardQuadFromTo(mediumColoredPoint3, mediumColoredPoint4)
+            standardQuadFromTo(mediumColoredPoint4, mediumColoredPoint5)
             lineTo(width.toFloat() + 100f, height.toFloat() + 100f)
             lineTo(-100f, height.toFloat() + 100f)
             close()
@@ -278,10 +365,10 @@ fun FeatureItem(
             lineTo(-100f, height.toFloat() + 100f)
             close()
         }
-        
-        Canvas(modifier = Modifier
-            .fillMaxSize()
-        ){
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             drawPath(
                 path = mediumColoredPath,
                 color = feature.mediumColor
@@ -295,7 +382,7 @@ fun FeatureItem(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(15.dp)
-        ){
+        ) {
             Text(
                 text = feature.title,
                 style = MaterialTheme.typography.labelSmall,
@@ -315,7 +402,7 @@ fun FeatureItem(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable {
-                        //Handle the click
+                        // Handle the click
                     }
                     .align(Alignment.BottomEnd)
                     .clip(RoundedCornerShape(10.dp))
