@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.navigation.NavController
 import com.example.meditationappui.ui.theme.AquaBlue
 import com.example.meditationappui.ui.theme.Beige1
 import com.example.meditationappui.ui.theme.Beige2
@@ -65,7 +66,7 @@ import com.example.meditationappui.ui.theme.OrangeYellow3
 import com.example.meditationappui.ui.theme.TextWhite
 @ExperimentalFoundationApi
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .background(DeepBlue)
@@ -105,7 +106,8 @@ fun HomeScreen() {
                         Beige2,
                         Beige3
                     )
-                )
+                ),
+                navController
             )
         }
 
@@ -297,7 +299,7 @@ fun CurrentMeditation(
 
 @ExperimentalFoundationApi
 @Composable
-fun FeatureSection(features: List<Feature>) {
+fun FeatureSection(features: List<Feature>,navController: NavController) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Features",
@@ -310,7 +312,7 @@ fun FeatureSection(features: List<Feature>) {
             modifier = Modifier.fillMaxHeight()
         ) {
             items(features.size) {
-                FeatureItem(feature = features[it])
+                FeatureItem(feature = features[it],navController)
             }
         }
     }
@@ -318,7 +320,8 @@ fun FeatureSection(features: List<Feature>) {
 
 @Composable
 fun FeatureItem(
-    feature: Feature
+    feature: Feature,
+    navController: NavController
 ) {
     BoxWithConstraints(
         modifier = Modifier
@@ -403,6 +406,7 @@ fun FeatureItem(
                 modifier = Modifier
                     .clickable {
                         // Handle the click
+                        navController.navigate(Screen.DetailScreen.withArgs(feature.title))
                     }
                     .align(Alignment.BottomEnd)
                     .clip(RoundedCornerShape(10.dp))
